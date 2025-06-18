@@ -23,8 +23,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const photoItems = computed(() => props.photos.data);
 
+// Use a Set for efficient lookups and to ensure reactivity
+const bookmarkedSet = computed(() => new Set(props.bookmarkedPhotoIds));
+
 const isBookmarked = (photoId: number): boolean => {
-    return props.bookmarkedPhotoIds.includes(photoId);
+    return bookmarkedSet.value.has(photoId);
 };
 
 const toggleBookmark = (photo: Photo) => {
@@ -56,7 +59,7 @@ const toggleBookmark = (photo: Photo) => {
                                 <h3 class="font-bold text-lg text-white">{{ photo.title }}</h3>
                                 <p v-if="photo.user" class="text-sm text-gray-300">By: {{ photo.user.name }}</p>
                             </div>
-                            <div class="absolute top-2 right-2">
+                                                        <div v-if="photo.user_id !== $page.props.auth.user.id" class="absolute top-2 right-2">
                                 <button
                                     @click.prevent="toggleBookmark(photo)"
                                     class="p-2 bg-black/30 rounded-full text-white hover:bg-black/50 transition-colors"
