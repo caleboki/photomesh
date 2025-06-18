@@ -5,14 +5,32 @@ import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
+import { BookOpen, Folder, LayoutGrid, UploadCloud, Compass, Bookmark } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: '/dashboard', // Assuming route('dashboard') resolves to this
         icon: LayoutGrid,
+    },
+    {
+        title: 'Upload Photo',
+        href: route('photos.index'),
+        icon: UploadCloud,
+        active: route().current('photos.index'),
+    },
+    {
+        title: 'Discover',
+        href: route('photos.discover'),
+        icon: Compass,
+        active: route().current('photos.discover'),
+    },
+    {
+        title: 'My Bookmarks',
+        href: route('bookmarks.index'),
+        icon: Bookmark,
+        active: route().current('bookmarks.index'),
     },
 ];
 
