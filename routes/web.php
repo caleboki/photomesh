@@ -20,9 +20,10 @@ Route::get('dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/photos', [PhotoController::class, 'index'])->middleware(['auth', 'verified'])->name('photos.index');
+Route::get('/photos/discover', [PhotoController::class, 'discover'])->middleware(['auth', 'verified'])->name('photos.discover');
+Route::get('/photos/{photo}', [PhotoController::class, 'show'])->middleware(['auth', 'verified'])->name('photos.show');
 Route::post('/photos', [PhotoController::class, 'store'])->middleware(['auth', 'verified'])->name('photos.store');
 Route::delete('/photos/{photo}', [PhotoController::class, 'destroy'])->middleware(['auth', 'verified'])->name('photos.destroy');
-Route::get('/photos/discover', [PhotoController::class, 'discover'])->middleware(['auth', 'verified'])->name('photos.discover');
 
 // Bookmark routes
 Route::post('/photos/{photo}/bookmarks', [BookmarkController::class, 'store'])->middleware(['auth', 'verified'])->name('photos.bookmarks.store');

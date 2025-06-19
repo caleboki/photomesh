@@ -85,9 +85,18 @@ class PhotoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Photo $photo)
+    public function show(Photo $photo): InertiaResponse
     {
-        //
+        // Eager load the user who uploaded the photo
+        $photo->load('user');
+
+        // Check if the current user has bookmarked this photo
+        $isBookmarked = auth()->user() ? auth()->user()->bookmarks()->where('photo_id', $photo->id)->exists() : false;
+
+        return Inertia::render('Photos/Show', [
+            'photo' => $photo,
+            'isBookmarked' => $isBookmarked,
+        ]);
     }
 
     /**

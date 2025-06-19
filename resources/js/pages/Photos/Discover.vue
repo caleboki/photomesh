@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { Bookmark } from 'lucide-vue-next';
-import type { Photo, BreadcrumbItem, PaginatedResponse } from '@/types';
 import { computed } from 'vue';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import AppLayout from '@/layouts/AppLayout.vue';
+import type { Photo, BreadcrumbItem, PaginatedResponse } from '@/types';
+import { Bookmark } from 'lucide-vue-next';
 
 const props = defineProps<{
     photos: PaginatedResponse<Photo>;
     bookmarkedPhotoIds: number[];
 }>();
 
-const getImageUrl = (path: string) => {
-    return path.startsWith('http') ? path : `/storage/${path}`;
-};
+const page = usePage();
+const authUser = computed(() => page.props.auth.user);
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,9 +20,12 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const getImageUrl = (path: string) => {
+    return path.startsWith('http') ? path : `/storage/${path}`;
+};
+
 const photoItems = computed(() => props.photos.data);
 
-// Use a Set for efficient lookups and to ensure reactivity
 const bookmarkedSet = computed(() => new Set(props.bookmarkedPhotoIds));
 
 const isBookmarked = (photoId: number): boolean => {
@@ -38,11 +40,9 @@ const toggleBookmark = (photo: Photo) => {
     if (isBookmarked(photo.id)) {
         router.delete(route('photos.bookmarks.destroy', { photo: photo.id }), options);
     } else {
-        // The second argument for router.post is the data payload, which is empty here.
         router.post(route('photos.bookmarks.store', { photo: photo.id }), {}, options);
     }
 };
-
 </script>
 
 <template>
@@ -51,29 +51,32 @@ const toggleBookmark = (photo: Photo) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div v-if="photoItems && photoItems.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    <div v-for="photo in photoItems" :key="photo.id" class="group relative overflow-hidden rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl">
-                        <img :src="getImageUrl(photo.file_path)" :alt="photo.title" class="h-60 w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent">
-                            <div class="absolute bottom-0 left-0 p-4">
-                                <h3 class="font-bold text-lg text-white">{{ photo.title }}</h3>
-                                <p v-if="photo.user" class="text-sm text-gray-300">By: {{ photo.user.name }}</p>
-                            </div>
-                                                        <div v-if="photo.user_id !== $page.props.auth.user.id" class="absolute top-2 right-2">
-                                <button
-                                    @click.prevent="toggleBookmark(photo)"
-                                    class="p-2 bg-black/30 rounded-full text-white hover:bg-black/50 transition-colors"
-                                    :aria-label="isBookmarked(photo.id) ? 'Unbookmark Photo' : 'Bookmark Photo'"
-                                >
-                                    <Bookmark
-                                        class="w-5 h-5 transition-all"
-                                        :class="{ 'fill-current text-yellow-400': isBookmarked(photo.id) }"
-                                    />
-                                </button>
+                <div v-if="photoItems.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <Link v-for="photo in photoItems" :key="photo.id" :href="route('photos.show', { photo: photo.id })" class="block group">
+                        <div class="group relative overflow-hidden rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl">
+                            <img :src="getImageUrl(photo.file_path)" :alt="photo.title" class="h-60 w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent">
+                                <div class="absolute bottom-0 left-0 p-4">
+                                    <h3 class="font-bold text-lg text-white">{{ photo.title }}</h3>
+                                    <p v-if="photo.user" class="text-sm text-gray-300">By: {{ photo.user.name }}</p>
+                                </div>
+                                <div v-if="authUser && authUser.id !== photo.user_id" class="absolute top-2 right-2">
+                                    <button
+                                        @click.prevent="toggleBookmark(photo)"
+                                        class="p-2 bg-black/30 rounded-full text-white hover:bg-black/50 transition-colors"
+                                        :aria-label="isBookmarked(photo.id) ? 'Unbookmark Photo' : 'Bookmark Photo'"
+                                    >
+                                        <Bookmark
+                                            class="w-5 h-5 transition-all"
+                                            :class="{ 'fill-current text-yellow-400': isBookmarked(photo.id) }"
+                                        />
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </Link>
                 </div>
+
                 <div v-else class="text-center py-16">
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-8">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">No photos to discover yet!</h3>
@@ -87,7 +90,7 @@ const toggleBookmark = (photo: Photo) => {
                 <!-- Pagination Links -->
                 <div v-if="photos.links && photos.links.length > 3" class="mt-8 flex justify-center">
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        <template v-for="(link, index) in photos.links" :key="index">
+                         <template v-for="(link, index) in photos.links" :key="index">
                             <Link
                                 :href="link.url ?? ''"
                                 :class="[
