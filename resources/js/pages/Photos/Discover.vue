@@ -1,111 +1,189 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import AppLayout from '@/layouts/AppLayout.vue';
-import type { Photo, BreadcrumbItem, PaginatedResponse } from '@/types';
-import { Bookmark } from 'lucide-vue-next';
+import AppLayout from '@/layouts/AppLayout.vue'
+import { Button } from '@/components/ui/button'
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card'
+import {
+    Pagination,
+    PaginationEllipsis,
+    PaginationContent,
+    PaginationItem,
+    PaginationNext,
+    PaginationPrevious,
+} from '@/components/ui/pagination'
+import type { Photo, BreadcrumbItemType, PaginatedResponse, Link as InertiaLinkType } from '@/types'
+import { Head, Link, router, usePage } from '@inertiajs/vue3'
+import { Bookmark, ImageOff } from 'lucide-vue-next'
+import { computed } from 'vue'
 
 const props = defineProps<{
-    photos: PaginatedResponse<Photo>;
-    bookmarkedPhotoIds: number[];
-}>();
+    photos: PaginatedResponse<Photo>
+    bookmarkedPhotoIds: number[]
+}>()
 
-const page = usePage();
-const authUser = computed(() => page.props.auth.user);
+const page = usePage()
+const authUser = computed(() => page.props.auth.user)
 
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs: BreadcrumbItemType[] = [
     {
         title: 'Discover Photos',
         href: route('photos.discover'),
     },
-];
+]
 
 const getImageUrl = (path: string) => {
-    return path.startsWith('http') ? path : `/storage/${path}`;
-};
+    return path.startsWith('http') ? path : `/storage/${path}`
+}
 
-const photoItems = computed(() => props.photos.data);
+const photoItems = computed(() => props.photos.data)
+const paginationLinks = computed(() => props.photos.links)
 
-const bookmarkedSet = computed(() => new Set(props.bookmarkedPhotoIds));
+const bookmarkedSet = computed(() => new Set(props.bookmarkedPhotoIds))
 
 const isBookmarked = (photoId: number): boolean => {
-    return bookmarkedSet.value.has(photoId);
-};
+    return bookmarkedSet.value.has(photoId)
+}
 
 const toggleBookmark = (photo: Photo) => {
     const options = {
         preserveScroll: true,
-    };
+        preserveState: true,
+    }
 
     if (isBookmarked(photo.id)) {
-        router.delete(route('photos.bookmarks.destroy', { photo: photo.id }), options);
+        router.delete(
+            route('photos.bookmarks.destroy', { photo: photo.id }),
+            options,
+        )
     } else {
-        router.post(route('photos.bookmarks.store', { photo: photo.id }), {}, options);
+        router.post(
+            route('photos.bookmarks.store', { photo: photo.id }),
+            {},
+            options,
+        )
     }
-};
+}
+
+const getPageUrl = (pageNumber: number): string => {
+    const link = paginationLinks.value.find(l => !isNaN(Number(l.label)) && Number(l.label) === pageNumber);
+    return link?.url ?? '';
+}
 </script>
 
 <template>
     <Head title="Discover Photos" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div v-if="photoItems.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    <Link v-for="photo in photoItems" :key="photo.id" :href="route('photos.show', { photo: photo.id })" class="block group">
-                        <div class="group relative overflow-hidden rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl">
-                            <img :src="getImageUrl(photo.file_path)" :alt="photo.title" class="h-60 w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent">
-                                <div class="absolute bottom-0 left-0 p-4">
-                                    <h3 class="font-bold text-lg text-white">{{ photo.title }}</h3>
-                                    <p v-if="photo.user" class="text-sm text-gray-300">By: {{ photo.user.name }}</p>
-                                </div>
-                                <div v-if="authUser && authUser.id !== photo.user_id" class="absolute top-2 right-2">
-                                    <button
-                                        @click.prevent="toggleBookmark(photo)"
-                                        class="p-2 bg-black/30 rounded-full text-white hover:bg-black/50 transition-colors"
-                                        :aria-label="isBookmarked(photo.id) ? 'Unbookmark Photo' : 'Bookmark Photo'"
-                                    >
-                                        <Bookmark
-                                            class="w-5 h-5 transition-all"
-                                            :class="{ 'fill-current text-yellow-400': isBookmarked(photo.id) }"
-                                        />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+        <div class="container mx-auto py-8 sm:px-6 lg:px-8">
+            <div
+                v-if="photoItems.length > 0"
+                class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            >
+                <Card
+                    v-for="photo in photoItems"
+                    :key="photo.id"
+                    class="overflow-hidden"
+                >
+                    <Link
+                        :href="route('photos.show', { photo: photo.id })"
+                        class="block"
+                    >
+                        <CardHeader class="p-0">
+                            <img
+                                :src="getImageUrl(photo.file_path)"
+                                :alt="photo.title"
+                                class="aspect-square h-auto w-full object-cover transition-transform duration-300 hover:scale-105"
+                            />
+                        </CardHeader>
                     </Link>
-                </div>
+                    <CardContent class="p-4">
+                        <Link
+                            :href="route('photos.show', { photo: photo.id })"
+                        >
+                            <CardTitle class="mb-1 truncate text-lg">
+                                {{ photo.title }}
+                            </CardTitle>
+                        </Link>
+                        <CardDescription
+                            v-if="photo.user"
+                            class="text-sm text-muted-foreground"
+                        >
+                            By: {{ photo.user.name }}
+                        </CardDescription>
+                    </CardContent>
+                    <CardFooter
+                        v-if="authUser && authUser.id !== photo.user_id"
+                        class="p-4 pt-0"
+                    >
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            class="w-full"
+                            @click.prevent="toggleBookmark(photo)"
+                        >
+                            <Bookmark
+                                class="mr-2 size-4"
+                                :class="{
+                                    'fill-primary text-primary':
+                                        isBookmarked(photo.id),
+                                }"
+                            />
+                            {{
+                                isBookmarked(photo.id)
+                                    ? 'Bookmarked'
+                                    : 'Bookmark'
+                            }}
+                        </Button>
+                    </CardFooter>
+                </Card>
+            </div>
 
-                <div v-else class="text-center py-16">
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-8">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">No photos to discover yet!</h3>
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Check back later or upload your own.</p>
-                        <Link :href="route('photos.index')" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <Card
+                v-else
+                class="mt-8 flex flex-col items-center justify-center py-16"
+            >
+                <CardHeader class="text-center">
+                    <ImageOff class="mx-auto mb-4 size-16 text-muted-foreground" />
+                    <CardTitle>No photos to discover yet!</CardTitle>
+                    <CardDescription class="mt-2">
+                        Check back later or be the first to share.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button as-child>
+                        <Link :href="route('photos.index')">
                             Upload Photo
                         </Link>
-                    </div>
-                </div>
+                    </Button>
+                </CardContent>
+            </Card>
 
-                <!-- Pagination Links -->
-                <div v-if="photos.links && photos.links.length > 3" class="mt-8 flex justify-center">
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                         <template v-for="(link, index) in photos.links" :key="index">
-                            <Link
-                                :href="link.url ?? ''"
-                                :class="[
-                                    'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                                    link.active ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600 dark:bg-indigo-900 dark:border-indigo-700 dark:text-indigo-300' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700',
-                                    { 'rounded-l-md': index === 0 },
-                                    { 'rounded-r-md': index === photos.links.length - 1 },
-                                    { '!bg-gray-100 dark:!bg-gray-700 !text-gray-400 dark:!text-gray-500 cursor-not-allowed': !link.url }
-                                ]"
-                                v-html="link.label"
-                                :disabled="!link.url"
-                            />
-                        </template>
-                    </nav>
-                </div>
+            <div
+                v-if="photos.links && photos.links.length > 3"
+                class="mt-12 flex justify-center"
+            >
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <template v-for="(link, index) in photos.links" :key="index">
+                        <Link
+                            :href="link.url || '#'"
+                            :class="[
+                                'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
+                                link.active ? 'z-10 bg-primary-50 border-primary-500 text-primary-600 dark:bg-primary-900 dark:border-primary-700 dark:text-primary-300' : 'bg-background border-border text-muted-foreground hover:bg-muted',
+                                { 'rounded-l-md': index === 0 },
+                                { 'rounded-r-md': index === photos.links.length - 1 },
+                                { 'bg-muted text-muted-foreground cursor-not-allowed': !link.url }
+                            ]"
+                            v-html="link.label"
+                            :disabled="!link.url"
+                        />
+                    </template>
+                </nav>
             </div>
         </div>
     </AppLayout>

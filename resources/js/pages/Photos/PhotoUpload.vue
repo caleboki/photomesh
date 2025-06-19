@@ -1,75 +1,107 @@
 <script setup lang="ts">
-import { useForm, Head } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
+import AppLayout from '@/Layouts/AppLayout.vue'
+import { Button } from '@/components/ui/button'
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import InputError from '@/components/InputError.vue'
+import type { BreadcrumbItemType } from '@/types'
+import { Head, useForm } from '@inertiajs/vue3'
 
 const form = useForm({
-  title: '',
-  description: '',
-  image: null as File | null,
-});
+    title: '',
+    description: '',
+    image: null as File | null,
+})
 
-const submit = () => {
-  form.post(route('photos.store'), {
-    onError: (errors) => {
-      // Handle errors, e.g., display them
-      console.error('Upload errors:', errors);
+const breadcrumbs: BreadcrumbItemType[] = [
+    {
+        title: 'Upload Photo',
+        href: route('photos.index'),
     },
-    onSuccess: () => {
-      // Handle success, e.g., clear form or show success message
-      form.reset();
-    },
-  });
-};
+]
 
 const handleFileChange = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  if (target.files && target.files[0]) {
-    form.image = target.files[0];
-  }
-};
+    const target = event.target as HTMLInputElement
+    if (target.files && target.files[0]) {
+        form.image = target.files[0]
+    }
+}
+
+const submit = () => {
+    form.post(route('photos.store'), {
+        onSuccess: () => {
+            form.reset()
+        },
+    })
+}
 </script>
 
 <template>
-  <Head title="Upload Photo" />
-  <AppLayout>
-    <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-        Upload New Photo
-      </h2>
-    </template>
-
-    <div class="py-12">
-      <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-          <div class="p-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-            <form @submit.prevent="submit" class="space-y-6">
-              <div>
-                <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
-                <input type="text" v-model="form.title" id="title" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-gray-200" />
-                <div v-if="form.errors.title" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.title }}</div>
-              </div>
-
-              <div>
-                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description (Optional)</label>
-                <textarea v-model="form.description" id="description" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-gray-200"></textarea>
-                <div v-if="form.errors.description" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.description }}</div>
-              </div>
-
-              <div>
-                <label for="image" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Photo</label>
-                <input type="file" @change="handleFileChange" accept="image/*" id="image" class="mt-1 block w-full text-sm text-gray-900 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-600 file:text-indigo-700 dark:file:text-indigo-50 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-700" />
-                <div v-if="form.errors.image" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.image }}</div>
-              </div>
-
-              <div class="flex justify-end">
-                <button type="submit" :disabled="form.processing" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
-                  Upload Photo
-                </button>
-              </div>
-            </form>
-          </div>
+    <Head title="Upload Photo" />
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <div class="py-12">
+            <div class="mx-auto max-w-2xl sm:px-6 lg:px-8">
+                <form @submit.prevent="submit">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle> Upload New Photo </CardTitle>
+                            <CardDescription>
+                                Choose an image file and provide some details
+                                about your photo.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent class="grid gap-6">
+                            <div class="grid w-full max-w-sm items-center gap-2">
+                                <Label for="image">Photo</Label>
+                                <Input
+                                    id="image"
+                                    type="file"
+                                    accept="image/*"
+                                    @change="handleFileChange"
+                                />
+                                <InputError :message="form.errors.image" />
+                            </div>
+                            <div class="grid w-full items-center gap-2">
+                                <Label for="title">Title</Label>
+                                <Input
+                                    id="title"
+                                    v-model="form.title"
+                                    type="text"
+                                    placeholder="e.g. A day at the beach"
+                                />
+                                <InputError :message="form.errors.title" />
+                            </div>
+                            <div class="grid w-full items-center gap-2">
+                                <Label for="description"
+                                    >Description (Optional)</Label
+                                >
+                                <Textarea
+                                    id="description"
+                                    v-model="form.description"
+                                    placeholder="e.g. A beautiful sunset over the ocean."
+                                />
+                                <InputError
+                                    :message="form.errors.description"
+                                />
+                            </div>
+                        </CardContent>
+                        <CardFooter class="flex justify-end">
+                            <Button type="submit" :disabled="form.processing">
+                                Upload Photo
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                </form>
+            </div>
         </div>
-      </div>
-    </div>
-  </AppLayout>
+    </AppLayout>
 </template>

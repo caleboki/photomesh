@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 
 interface Props {
@@ -15,12 +16,16 @@ defineProps<Props>();
         <SidebarGroupContent>
             <SidebarMenu>
                 <SidebarMenuItem v-for="item in items" :key="item.title">
-                    <SidebarMenuButton class="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100" as-child>
+                    <Button
+                        as-child
+                        variant="ghost"
+                        class="w-full justify-start"
+                    >
                         <a :href="item.href" target="_blank" rel="noopener noreferrer">
-                            <component :is="item.icon" />
+                            <component :is="item.icon" class="mr-2 size-4" />
                             <span>{{ item.title }}</span>
                         </a>
-                    </SidebarMenuButton>
+                    </Button>
                 </SidebarMenuItem>
             </SidebarMenu>
         </SidebarGroupContent>

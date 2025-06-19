@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 
@@ -15,12 +16,16 @@ const page = usePage();
         <SidebarGroupLabel>Platform</SidebarGroupLabel>
         <SidebarMenu>
             <SidebarMenuItem v-for="item in items" :key="item.title">
-                <SidebarMenuButton as-child :is-active="item.href === page.url" :tooltip="item.title">
+                <Button
+                    as-child
+                    :variant="item.active ? 'secondary' : 'ghost'"
+                    class="w-full justify-start"
+                >
                     <Link :href="item.href">
-                        <component :is="item.icon" />
+                        <component :is="item.icon" class="mr-2 size-4" />
                         <span>{{ item.title }}</span>
                     </Link>
-                </SidebarMenuButton>
+                </Button>
             </SidebarMenuItem>
         </SidebarMenu>
     </SidebarGroup>

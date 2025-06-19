@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { BookmarkX } from 'lucide-vue-next';
 import type { Photo, BreadcrumbItem, PaginatedResponse } from '@/types';
 import { computed } from 'vue';
 
@@ -30,7 +33,7 @@ const photoItems = computed(() => props.photos.data);
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div v-if="photoItems && photoItems.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    <div v-for="photo in photoItems" :key="photo.id" class="group relative overflow-hidden rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl">
+                    <Link v-for="photo in photoItems" :key="photo.id" :href="route('photos.show', { photo: photo.id })" class="block group relative overflow-hidden rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl">
                         <img :src="getImageUrl(photo.file_path)" :alt="photo.title" class="h-60 w-full object-cover transition-transform duration-300 group-hover:scale-105" />
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent">
                             <div class="absolute bottom-0 left-0 p-4">
@@ -38,17 +41,20 @@ const photoItems = computed(() => props.photos.data);
                                 <p v-if="photo.user" class="text-sm text-gray-300">By: {{ photo.user.name }}</p>
                             </div>
                         </div>
-                    </div>
+                    </Link>
                 </div>
-                <div v-else class="text-center py-16">
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-8">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">You haven't bookmarked any photos yet.</h3>
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Head over to the Discover page to find photos you like.</p>
-                        <Link :href="route('photos.discover')" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <Card v-else class="mt-8 flex flex-col items-center justify-center py-16 text-center">
+                    <BookmarkX class="mx-auto mb-4 size-16 text-muted-foreground" />
+                    <h3 class="text-2xl font-semibold leading-none tracking-tight">No bookmarks yet!</h3>
+                    <p class="mt-2 text-sm text-muted-foreground">
+                        Head over to the Discover page to find photos you like.
+                    </p>
+                    <Button as-child class="mt-6">
+                        <Link :href="route('photos.discover')">
                             Discover Photos
                         </Link>
-                    </div>
-                </div>
+                    </Button>
+                </Card>
 
                 <!-- Pagination Links -->
                 <div v-if="photos.links && photos.links.length > 3" class="mt-8 flex justify-center">
