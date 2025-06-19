@@ -7,7 +7,10 @@ use App\Http\Controllers\BookmarkController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+    return Inertia::render('Home');
 })->name('home');
 
 Route::get('dashboard', function () {
