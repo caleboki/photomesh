@@ -144,25 +144,25 @@ const getPageUrl = (pageNumber: number): string => {
                 </Card>
             </div>
 
-            <Card
+            <div
                 v-else
-                class="mt-8 flex flex-col items-center justify-center py-16"
+                class="flex h-[60vh] flex-col items-center justify-center rounded-md border border-dashed"
             >
-                <CardHeader class="text-center">
-                    <ImageOff class="mx-auto mb-4 size-16 text-muted-foreground" />
-                    <CardTitle>No photos to discover yet!</CardTitle>
-                    <CardDescription class="mt-2">
-                        Check back later or be the first to share.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Button as-child>
+                <div class="flex flex-col items-center justify-center text-center">
+                    <ImageOff class="mb-4 size-16 text-muted-foreground" />
+                    <h3 class="text-2xl font-semibold tracking-tight">
+                        No photos have been uploaded yet.
+                    </h3>
+                    <p class="mt-2 text-sm text-muted-foreground">
+                        Be the first to share a photo!
+                    </p>
+                    <Button as-child class="mt-6">
                         <Link :href="route('photos.index')">
-                            Upload Photo
+                            Upload a Photo
                         </Link>
                     </Button>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
 
             <div
                 v-if="photos.links && photos.links.length > 3"
