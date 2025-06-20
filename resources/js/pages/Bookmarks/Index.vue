@@ -11,9 +11,7 @@ const props = defineProps<{
     photos: PaginatedResponse<Photo>;
 }>();
 
-const getImageUrl = (path: string) => {
-    return path.startsWith('http') ? path : `/storage/${path}`;
-};
+
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -34,7 +32,7 @@ const photoItems = computed(() => props.photos.data);
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div v-if="photoItems && photoItems.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     <Link v-for="photo in photoItems" :key="photo.id" :href="route('photos.show', { photo: photo.id })" class="block group relative overflow-hidden rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl">
-                        <img :src="getImageUrl(photo.file_path)" :alt="photo.title" class="h-60 w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                        <img :src="photo.file_url" :alt="photo.title" class="h-60 w-full object-cover transition-transform duration-300 group-hover:scale-105" />
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent">
                             <div class="absolute bottom-0 left-0 p-4">
                                 <h3 class="font-bold text-lg text-white">{{ photo.title }}</h3>
