@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea'
 import InputError from '@/components/InputError.vue'
 import type { BreadcrumbItemType } from '@/types'
 import { Head, useForm } from '@inertiajs/vue3'
+import { toast } from 'vue-sonner'
 
 const form = useForm({
     title: '',
@@ -39,6 +40,9 @@ const handleFileChange = (event: Event) => {
 const submit = () => {
     form.post(route('photos.store'), {
         onSuccess: () => {
+            toast.success('Photo uploaded successfully!', {
+                description: 'Your photo has been successfully uploaded.',
+            })
             form.reset()
         },
     })
