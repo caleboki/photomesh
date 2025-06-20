@@ -13,9 +13,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import InputError from '@/components/InputError.vue'
+import { ref } from 'vue'
 import type { BreadcrumbItemType } from '@/types'
 import { Head, useForm } from '@inertiajs/vue3'
 import { toast } from 'vue-sonner'
+
+const fileInputRef = ref<HTMLInputElement | null>(null)
 
 const form = useForm({
     title: '',
@@ -44,6 +47,9 @@ const submit = () => {
                 description: 'Your photo has been successfully uploaded.',
             })
             form.reset()
+            if (fileInputRef.value?.input) {
+                fileInputRef.value.input.value = ''
+            }
         },
     })
 }
@@ -68,6 +74,7 @@ const submit = () => {
                                 <Label for="image">Photo</Label>
                                 <Input
                                     id="image"
+                                    ref="fileInputRef"
                                     type="file"
                                     accept="image/*"
                                     @change="handleFileChange"
