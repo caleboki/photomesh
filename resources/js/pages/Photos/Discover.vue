@@ -37,9 +37,7 @@ const breadcrumbs: BreadcrumbItemType[] = [
     },
 ]
 
-const getImageUrl = (path: string) => {
-    return path.startsWith('http') ? path : `/storage/${path}`
-}
+
 
 const photoItems = computed(() => props.photos.data)
 const paginationLinks = computed(() => props.photos.links)
@@ -96,7 +94,7 @@ const getPageUrl = (pageNumber: number): string => {
                     >
                         <CardHeader class="p-0">
                             <img
-                                :src="getImageUrl(photo.file_path)"
+                                :src="photo.file_url"
                                 :alt="photo.title"
                                 class="aspect-square h-auto w-full object-cover transition-transform duration-300 hover:scale-105"
                             />

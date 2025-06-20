@@ -33,9 +33,7 @@ const breadcrumbs = computed<BreadcrumbItemType[]>(() => [
     },
 ])
 
-const getImageUrl = (path: string) => {
-    return path.startsWith('http') ? path : `/storage/${path}`
-}
+
 
 const formattedJoinDate = computed(() => {
     if (!props.photo.user?.created_at) return ''
@@ -78,7 +76,7 @@ const toggleBookmark = () => {
                     <div class="md:col-span-2">
                         <CardHeader class="p-0">
                             <img
-                                :src="getImageUrl(props.photo.file_path)"
+                                :src="props.photo.file_url"
                                 :alt="props.photo.title"
                                 class="h-full max-h-[80vh] w-full object-cover"
                             />

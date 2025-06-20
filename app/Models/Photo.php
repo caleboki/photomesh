@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
 
 class Photo extends Model
 {
@@ -22,6 +24,13 @@ class Photo extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = ['file_url'];
+
+    /**
      * Get the user that owns the photo.
      */
     public function user(): BelongsTo
@@ -35,6 +44,16 @@ class Photo extends Model
     public function bookmarkedBy(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'bookmarks')->withTimestamps();
+    }
+
+    /**
+     * Get the full URL to the photo.
+     */
+    protected function fileUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => Storage::url($this->file_path),
+        );
     }
 
     /** @use HasFactory<\Database\Factories\PhotoFactory> */

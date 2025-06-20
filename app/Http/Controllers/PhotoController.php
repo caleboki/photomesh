@@ -68,7 +68,7 @@ class PhotoController extends Controller
 
         $path = null;
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('photos', 'public');
+            $path = $request->file('image')->storePublicly('photos');
         }
 
         $photo = Photo::create([
@@ -124,7 +124,7 @@ class PhotoController extends Controller
 
         // Delete the physical file
         if ($photo->file_path) {
-            Storage::disk('public')->delete($photo->file_path);
+            Storage::delete($photo->file_path);
         }
 
         $photo->delete();
