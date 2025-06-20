@@ -77,17 +77,24 @@ const breadcrumbs: BreadcrumbItemType[] = [
                     :key="photo.id"
                     class="overflow-hidden"
                 >
-                    <CardHeader class="p-0">
-                        <img
-                            :src="getImageUrl(photo.file_path)"
-                            :alt="photo.title"
-                            class="aspect-square h-auto w-full object-cover transition-transform duration-300 hover:scale-105"
-                        />
-                    </CardHeader>
+                    <Link
+                        :href="route('photos.show', { photo: photo.id })"
+                        class="block"
+                    >
+                        <CardHeader class="p-0">
+                            <img
+                                :src="getImageUrl(photo.file_path)"
+                                :alt="photo.title"
+                                class="aspect-square h-auto w-full object-cover transition-transform duration-300 hover:scale-105"
+                            />
+                        </CardHeader>
+                    </Link>
                     <CardContent class="p-4">
-                        <CardTitle class="mb-1 truncate text-lg">
-                            {{ photo.title }}
-                        </CardTitle>
+                        <Link :href="route('photos.show', { photo: photo.id })">
+                            <CardTitle class="mb-1 truncate text-lg">
+                                {{ photo.title }}
+                            </CardTitle>
+                        </Link>
                     </CardContent>
                     <CardFooter class="p-4 pt-0">
                         <Button
