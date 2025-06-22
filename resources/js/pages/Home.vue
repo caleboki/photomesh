@@ -40,7 +40,7 @@ import { Camera, Heart, UploadCloud, Lock } from 'lucide-vue-next'
                     <div class="blur-[106px] h-56 bg-gradient-to-br from-primary to-purple-400 dark:from-blue-700" />
                     <div class="blur-[106px] h-32 bg-gradient-to-r from-cyan-400 to-sky-300 dark:to-indigo-600" />
                 </div>
-                <div class="container mx-auto px-4 text-center">
+                                <div class="container relative mx-auto px-4 text-center">
                     <h1 class="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">
                         Your Beautiful Moments, Perfectly Organized
                     </h1>
@@ -49,8 +49,9 @@ import { Camera, Heart, UploadCloud, Lock } from 'lucide-vue-next'
                     </p>
                     <div class="mt-8 flex justify-center gap-4">
                         <Button size="lg" as-child>
-                            <Link :href="route('register')">Sign Up for Free</Link>
+                            <Link :href="route('register')">Sign Up For Free</Link>
                         </Button>
+                        
                     </div>
                 </div>
             </section>
